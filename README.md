@@ -9,9 +9,9 @@ A gulp task for updating your local dependencies installed by [jspm-local](https
 Install `gulp-jspm-local` using npm into your global or local repository.
 
 ```bash
-npm install -g jspm-local
+npm install -g gulp-jspm-local
 # or locally
-npm install jspm-local --save-dev
+npm install gulp-jspm-local --save-dev
 ```
 ## Usage
 
