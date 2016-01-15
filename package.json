@@ -1,0 +1,20 @@
+{
+  "version": "1.0.0",
+  "name": "gulp-jspm-local",
+  "description": "Gulp task to update local dependencies installed by jspm-local",
+  "private": false,
+  "main": "index.js",
+  "files": [
+    "index.js"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Netatwork-de/gulp-jspm-local.git"
+  },
+  "license": "Apache-2.0",
+  "devDependencies": {},
+  "dependencies": {
+    "graceful-fs": "^4.1.2",
+    "rsvp": "^3.1.0"
+  }
+}
