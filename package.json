@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.0.1",
   "name": "gulp-jspm-local",
   "description": "Gulp task to update local dependencies installed by jspm-local",
   "private": false,

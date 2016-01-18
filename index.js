@@ -1,11 +1,11 @@
 ﻿// Copyright 2016 Net at Work GmbH
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,7 +42,7 @@ function copyFiles(src, dest) {
 			return asp(fs.readdir)(src);
 		})
 		.then(function (filePaths) {
-			var tasks = filePaths.filter(function (fileName) { 
+			var tasks = filePaths.filter(function (fileName) {
 				return fileName.indexOf("jspm_packages") <= -1
 					&& fileName.indexOf("node_modules") <= -1;
 				})
@@ -50,7 +50,7 @@ function copyFiles(src, dest) {
 					var filePath = path.resolve(src, fileName);
 					var outFilePath = path.resolve(dest, fileName);
 					var isDirectory = fs.lstatSync(filePath).isDirectory();
-					
+
 					if (isDirectory) {
 						return copyFiles(filePath, outFilePath);
 					} else {
@@ -66,45 +66,46 @@ function copyFiles(src, dest) {
 }
 
 function syncProject(path) {
-    var packageName = path.substring(0, path.indexOf('@')); 
-    gutil.log("Starting sync for package", gutil.colors.yellow(packageName)); 
-    
+    var packageName = path.substring(0, path.indexOf('@'));
+    gutil.log("Starting sync for package", gutil.colors.yellow(packageName));
+
     return getPackageObject(packageName)
     .then(function(project) {
-        var projectPath = '../' + packageName;  
-        
+        var projectPath = '../' + packageName;
+
         var files = []
         if(project.files !== undefined && project.files.length == 0){
             gutil.log("\t",project.files.length, "file(s) defined.");
-            files = project.files;        
+            files = project.files;
         }
         else {
-            gutil.log("\tNo files defined in package.json. All files will be included.");
+            gutil.log("\tNo files defined in package.json. All files are included.");
         }
-        
+
         if(project.directories.lib !== undefined){
             gutil.log("\tLib path '" + project.directories.lib + "' found.");
             projectPath += '/' + project.directories.lib;
         }
         else {
-            gutil.log("\tNo lib path found. Loading from root.");            
+            gutil.log("\tNo lib path found. Loading from root.");
         }
-    
-        return copyFiles(projectPath,path);      
-    });  
-       
+				var targetPath = dependencyPath + "/" + path;
+				gutil.log("\tCopying files from  " + projectPath + " to " + targetPath)
+        return copyFiles(projectPath, targetPath);
+    });
+
 }
 
-function isDirectory(fileName) {   
+function isDirectory(fileName) {
     var filePath = path.resolve(dependencyPath, fileName);
     return fs.lstatSync(filePath).isDirectory();
 }
 
-function updateLocalDependencies() { 
+function updateLocalDependencies() {
     return asp(fs.readdir)(dependencyPath)
         .then(function(files) {
-            return Promise.all(files.filter(isDirectory).map(syncProject));                        
-        });    
+            return Promise.all(files.filter(isDirectory).map(syncProject));
+        });
 }
 
 module.exports = {
