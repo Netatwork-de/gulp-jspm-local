@@ -79,7 +79,7 @@ function syncProject(path) {
             files = project.files;
         }
         else {
-            gutil.log("\tNo files defined in package.json. All files are included.");
+            gutil.log("\tNo files defined in package.json. All files will be included.");
         }
 
         if(project.directories.lib !== undefined){
@@ -89,9 +89,8 @@ function syncProject(path) {
         else {
             gutil.log("\tNo lib path found. Loading from root.");
         }
-				var targetPath = dependencyPath + "/" + path;
-				gutil.log("\tCopying files from  " + projectPath + " to " + targetPath)
-        return copyFiles(projectPath, targetPath);
+
+        return copyFiles(projectPath,path);
     });
 
 }
@@ -101,7 +100,10 @@ function isDirectory(fileName) {
     return fs.lstatSync(filePath).isDirectory();
 }
 
-function updateLocalDependencies() {
+function updateLocalDependencies(projects) {
+		if (projects !== undefined) {
+			return Promise.all(projects.map(function(p){ syncProject(path.join(dependencyPath, p))})); 
+		}
     return asp(fs.readdir)(dependencyPath)
         .then(function(files) {
             return Promise.all(files.filter(isDirectory).map(syncProject));
