@@ -1,5 +1,5 @@
 {
-  "version": "1.0.3",
+  "version": "1.0.4",
   "name": "gulp-jspm-local",
   "description": "Gulp task to update local dependencies installed by jspm-local",
   "private": false,
@@ -15,6 +15,7 @@
   "devDependencies": {},
   "dependencies": {
     "graceful-fs": "^4.1.2",
+    "gulp-util": "^3.0.7",
     "rsvp": "^3.1.0"
   }
 }

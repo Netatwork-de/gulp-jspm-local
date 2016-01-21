@@ -66,8 +66,14 @@ function copyFiles(src, dest) {
 }
 
 function syncProject(path) {
-    var packageName = path.substring(0, path.indexOf('@'));
-    gutil.log("Starting sync for package", gutil.colors.yellow(packageName));
+	var index = path.indexOf('@');
+	if (index != -1) {
+    	var packageName = path.substring(0, index);
+	}
+	else {
+		packageName = path;
+	}
+    gutil.log("Updating package", gutil.colors.yellow(packageName));
 
     return getPackageObject(packageName)
     .then(function(project) {
@@ -101,9 +107,9 @@ function isDirectory(fileName) {
 }
 
 function updateLocalDependencies(projects) {
-		if (projects !== undefined) {
-			return Promise.all(projects.map(function(p){ syncProject(path.join(dependencyPath, p))})); 
-		}
+	if (projects !== undefined) {
+		return Promise.all(projects.map(syncProject));
+	}
     return asp(fs.readdir)(dependencyPath)
         .then(function(files) {
             return Promise.all(files.filter(isDirectory).map(syncProject));
