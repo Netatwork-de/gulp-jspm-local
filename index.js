@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//     http://www.apache.org/licenses/LICENSE-2.0
+//	 http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -65,57 +65,58 @@ function copyFiles(src, dest) {
 		});
 }
 
-function syncProject(path) {
-	var index = path.indexOf('@');
+function syncProject(packageDirectory) {
+	var index = packageDirectory.indexOf('@');
 	if (index != -1) {
-    	var packageName = path.substring(0, index);
+		var packageName = packageDirectory.substring(0, index);
 	}
 	else {
 		packageName = path;
 	}
-    gutil.log("Updating package", gutil.colors.yellow(packageName));
+	gutil.log("Updating package", gutil.colors.yellow(packageName));
 
-    return getPackageObject(packageName)
-    .then(function(project) {
-        var projectPath = '../' + packageName;
+	return getPackageObject(packageName)
+	.then(function(project) {
+		var projectPath = '../' + packageName;
 
-        var files = []
-        if(project.files !== undefined && project.files.length == 0){
-            gutil.log("\t",project.files.length, "file(s) defined.");
-            files = project.files;
-        }
-        else {
-            gutil.log("\tNo files defined in package.json. All files will be included.");
-        }
+		var files = []
+		if(project.files !== undefined && project.files.length == 0){
+			gutil.log("\t",project.files.length, "file(s) defined.");
+			files = project.files;
+		}
+		else {
+			gutil.log("\tNo files defined in package.json. All files will be included.");
+		}
 
-        if(project.directories.lib !== undefined){
-            gutil.log("\tLib path '" + project.directories.lib + "' found.");
-            projectPath += '/' + project.directories.lib;
-        }
-        else {
-            gutil.log("\tNo lib path found. Loading from root.");
-        }
+		if(project.directories.lib !== undefined){
+			gutil.log("\tLib path '" + project.directories.lib + "' found.");
+			projectPath += '/' + project.directories.lib;
+		}
+		else {
+			gutil.log("\tNo lib path found. Loading from root.");
+		}
 
-        return copyFiles(projectPath,path);
-    });
+
+		return copyFiles(projectPath, path.join(dependencyPath, packageDirectory));
+	});
 
 }
 
 function isDirectory(fileName) {
-    var filePath = path.resolve(dependencyPath, fileName);
-    return fs.lstatSync(filePath).isDirectory();
+	var filePath = path.resolve(dependencyPath, fileName);
+	return fs.lstatSync(filePath).isDirectory();
 }
 
 function updateLocalDependencies(projects) {
 	if (projects !== undefined) {
 		return Promise.all(projects.map(syncProject));
 	}
-    return asp(fs.readdir)(dependencyPath)
-        .then(function(files) {
-            return Promise.all(files.filter(isDirectory).map(syncProject));
-        });
+	return asp(fs.readdir)(dependencyPath)
+		.then(function(files) {
+			return Promise.all(files.filter(isDirectory).map(syncProject));
+		});
 }
 
 module.exports = {
-    updateLocalDependencies: updateLocalDependencies
+	updateLocalDependencies: updateLocalDependencies
 };

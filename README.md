@@ -1,6 +1,6 @@
 gulp-jspm-local
 ===
-[![NPM version][npm-image]][npm-url] 
+[![NPM version][npm-image]][npm-url]
 
 A gulp task for updating your local dependencies installed by [jspm-local](https://github.com/Netatwork-de/jspm-local) endpoint.
 
@@ -9,8 +9,6 @@ A gulp task for updating your local dependencies installed by [jspm-local](https
 Install `gulp-jspm-local` using npm into your global or local repository.
 
 ```bash
-npm install -g gulp-jspm-local
-# or locally
 npm install gulp-jspm-local --save-dev
 ```
 ## Usage

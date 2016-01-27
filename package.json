@@ -1,21 +1,21 @@
 {
-  "version": "1.0.4",
-  "name": "gulp-jspm-local",
-  "description": "Gulp task to update local dependencies installed by jspm-local",
-  "private": false,
-  "main": "index.js",
-  "files": [
-    "index.js"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Netatwork-de/gulp-jspm-local.git"
-  },
-  "license": "Apache-2.0",
-  "devDependencies": {},
-  "dependencies": {
-    "graceful-fs": "^4.1.2",
-    "gulp-util": "^3.0.7",
-    "rsvp": "^3.1.0"
-  }
+	"version": "1.0.6",
+	"name": "gulp-jspm-local",
+	"description": "Gulp task to update local dependencies installed by jspm-local",
+	"private": false,
+	"main": "index.js",
+	"files": [
+		"index.js"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Netatwork-de/gulp-jspm-local.git"
+	},
+	"license": "Apache-2.0",
+	"devDependencies": {},
+	"dependencies": {
+		"graceful-fs": "^4.1.2",
+		"gulp-util": "^3.0.7",
+		"rsvp": "^3.1.0"
+	}
 }
