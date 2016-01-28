@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+'use strict'
 var Promise = require('rsvp').Promise;
 var asp = require('rsvp').denodeify;
 var fs = require('graceful-fs');
@@ -19,9 +20,7 @@ var gutil = require('gulp-util');
 
 var dependencyPath = 'jspm_packages/local';
 
-function getPackageObject(repo) {
-	var packageFile = path.resolve('..', repo + '/package.json');
-
+function getPackageObject(packageFile) {
 	return asp(fs.readFile)(packageFile)
 		.then(function(lookupJSON) {
 			return JSON.parse(lookupJSON.toString());
@@ -32,9 +31,14 @@ function getPackageObject(repo) {
 			throw e;
 		});
 }
-
+function ensureDependencyPath() {
+	return asp(fs.access)(dependencyPath, fs.F_OK)
+		.catch(function() {
+			fs.mkdirSync(dependencyPath);
+		})
+}
 function copyFiles(src, dest) {
-	return asp(fs.access)(dest, fs.F_OK)
+	asp(fs.access)(dest, fs.F_OK)
 		.catch(function() {
 			fs.mkdirSync(dest);
 		})
@@ -75,7 +79,7 @@ function syncProject(packageDirectory) {
 	}
 	gutil.log("Updating package", gutil.colors.yellow(packageName));
 
-	return getPackageObject(packageName)
+	return getPackageObject(path.resolve('..', packageName + '/package.json'))
 	.then(function(project) {
 		var projectPath = '../' + packageName;
 
@@ -96,10 +100,26 @@ function syncProject(packageDirectory) {
 			gutil.log("\tNo lib path found. Loading from root.");
 		}
 
-
 		return copyFiles(projectPath, path.join(dependencyPath, packageDirectory));
 	});
+}
 
+function getLocalDependencies() {
+	return getPackageObject("package.json").then(packageConfig => {
+		if (!packageConfig.jspm || !packageConfig.jspm.dependencies) throw "package.json does have jspm configured.";
+
+		let localDepedencies = [];
+
+		var dependencies = packageConfig.jspm.dependencies;
+		for (let dependency in dependencies)
+		{
+			var value = dependencies[dependency];
+			if (value.indexOf("local:") == 0) {
+				localDepedencies.push(value.substring("local:".length))
+			}
+		}
+		return localDepedencies;
+	});
 }
 
 function isDirectory(fileName) {
@@ -111,10 +131,11 @@ function updateLocalDependencies(projects) {
 	if (projects !== undefined) {
 		return Promise.all(projects.map(syncProject));
 	}
-	return asp(fs.readdir)(dependencyPath)
-		.then(function(files) {
-			return Promise.all(files.filter(isDirectory).map(syncProject));
-		});
+	else {
+		return ensureDependencyPath()
+			.then(getLocalDependencies)
+			.then(dependencies => Promise.all(dependencies.map(syncProject)));
+	}
 }
 
 module.exports = {
