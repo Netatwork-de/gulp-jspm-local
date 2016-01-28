@@ -18,7 +18,9 @@ var fs = require('graceful-fs');
 var path = require('path');
 var gutil = require('gulp-util');
 
-var dependencyPath = 'jspm_packages/local';
+
+const jspmPackageFolder = "jspm_packages";
+const dependencyPath = jspmPackageFolder + '/local';
 
 function getPackageObject(packageFile) {
 	return asp(fs.readFile)(packageFile)
@@ -31,10 +33,10 @@ function getPackageObject(packageFile) {
 			throw e;
 		});
 }
-function ensureDependencyPath() {
-	return asp(fs.access)(dependencyPath, fs.F_OK)
+function ensureDependencyPath(path) {
+	return asp(fs.access)(path, fs.F_OK)
 		.catch(function() {
-			fs.mkdirSync(dependencyPath);
+			fs.mkdirSync(path);
 		})
 }
 function copyFiles(src, dest) {
@@ -132,7 +134,8 @@ function updateLocalDependencies(projects) {
 		return Promise.all(projects.map(syncProject));
 	}
 	else {
-		return ensureDependencyPath()
+		return ensureDependencyPath(jspmPackageFolder)
+			.then(ensureDependencyPath(dependencyPath))
 			.then(getLocalDependencies)
 			.then(dependencies => Promise.all(dependencies.map(syncProject)));
 	}
